@@ -1,23 +1,27 @@
 {
   "name": "@labdigital/dataloader-cache-wrapper",
   "version": "0.0.1",
-  "description": "",
+  "description": "Wrapper around dataloader to cache the results of the loader",
   "main": "index.js",
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
+    "publish:ci": "pnpm build && pnpm changeset publish",
     "test": "jest test --coverage",
     "lint": "eslint *.ts"
   },
   "keywords": [],
-  "author": "",
+  "author": "Lab Digital <opensource@labdigital.nl>",
   "license": "MIT",
   "devDependencies": {
     "@changesets/cli": "^2.26.1",
     "@labdigital/eslint-config-node": "^0.0.5",
     "@types/jest": "^29.5.1",
+    "dataloader": "^2.2.2",
+    "esbuild-jest": "^0.5.0",
     "eslint": "^8.40.0",
     "eslint-plugin-unused-imports": "^2.0.0",
+    "ioredis": "^5.3.2",
     "jest": "^29.5.0",
     "tsup": "6.7.0",
     "typescript": "5.0.4"
