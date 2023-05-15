@@ -3,7 +3,7 @@ module.exports = {
   moduleDirectories: ['./node_modules', __dirname],
   moduleFileExtensions: ['ts', 'tsx', 'js'],
   transform: {
-    '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest',
+    "^.+\\.tsx?$": "esbuild-jest"
   },
   testMatch: ['<rootDir>/**/*.test.{ts,tsx,js}'],
   testEnvironment: "node",
