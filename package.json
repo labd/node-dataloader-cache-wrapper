@@ -3,6 +3,12 @@
   "version": "0.0.1",
   "description": "Wrapper around dataloader to cache the results of the loader",
   "main": "index.js",
+  "prettier": {
+    "printWidth": 80,
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
