@@ -14,8 +14,7 @@ type MyValue = {
 describe("Test no cache", () => {
   const fetchItemsBySlug = async (
     keys: readonly MyKey[]
-  ): Promise<(MyValue | null)[]> => {
-    return dataloaderCache(fetchItemsBySlugUncached, keys, {
+  ): Promise<(MyValue | null)[]> => dataloaderCache(fetchItemsBySlugUncached, keys, {
       client: undefined,
       ttl: 3600,
 
@@ -23,22 +22,15 @@ describe("Test no cache", () => {
         const key = `${ref.id}`;
         return [`item-data:${key}:id:${ref.slug}`];
       },
-      lookupFn: (items: MyValue[], ref: MyKey) => {
-        return items.find((p) => p.slug === ref.slug);
-      },
+      lookupFn: (items: MyValue[], ref: MyKey) => items.find((p) => p.slug === ref.slug),
     });
-  };
 
   const fetchItemsBySlugUncached = async (
     keys: readonly MyKey[]
-  ): Promise<(MyValue | null)[]> => {
-    return keys.map((key) => {
-      return {
+  ): Promise<(MyValue | null)[]> => keys.map((key) => ({
         slug: key.slug,
         name: key.slug,
-      };
-    });
-  };
+      }));
 
   const loader = new DataLoader<MyKey, any>(fetchItemsBySlug, {
     maxBatchSize: 50,
