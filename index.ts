@@ -1,5 +1,8 @@
+import { type Redis } from "ioredis";
+import type DataLoader from "dataloader";
+
 export type cacheOptions = {
-  client: any;
+  client?: Redis;
   ttl: number;
 
   cacheKeysFn: (ref: any) => string[];
@@ -13,18 +16,18 @@ export type cacheOptions = {
 //
 // Note: this function is O^2, so it should only be used for small batches of
 // keys.
-export const dataloaderCache = async (
-  batchLoadFn: any,
-  keys: ReadonlyArray<any>,
+export const dataloaderCache = async <K, V>(
+  batchLoadFn: DataLoader.BatchLoadFn<K, V>,
+  keys: ReadonlyArray<K>,
   options: cacheOptions
-) => {
-  const items = await fromCache(keys, options);
-  const result = new Array<any>(keys.length);
+): Promise<V[]> => {
+  const items = await fromCache<K, V>(keys, options);
+  const result = new Array<V>(keys.length);
 
   // Find the items that are not in the cache. Take a shortcut when the cache
   // is empty.
-  const cacheMiss: Array<any> = [];
-  if (items.length == 0) {
+  const cacheMiss: Array<K> = [];
+  if (items.length === 0) {
     cacheMiss.push(...keys);
   } else {
     keys.forEach((key, index) => {
@@ -41,7 +44,7 @@ export const dataloaderCache = async (
   // next time
   if (cacheMiss.length > 0) {
     const newItems = await batchLoadFn(cacheMiss);
-    const buffer = new Map<string, any>();
+    const buffer = new Map<string, V>();
 
     keys.forEach((key, index) => {
       const item = options.lookupFn(newItems, key);
@@ -54,18 +57,18 @@ export const dataloaderCache = async (
         });
       }
     });
-    await toCache(buffer, options);
+    await toCache<V>(buffer, options);
   }
 
   return result;
 };
 
-const fromCache = async (
-  keys: ReadonlyArray<any>,
+const fromCache = async <K, V>(
+  keys: ReadonlyArray<K>,
   options: cacheOptions
-): Promise<any> => {
+): Promise<V[]> => {
   if (!options.client) {
-    return [];
+    return []
   }
 
   const cacheKeys = keys.flatMap(options.cacheKeysFn);
@@ -75,15 +78,15 @@ const fromCache = async (
     .map((v: string) => JSON.parse(v));
 };
 
-const toCache = async (
-  items: Map<string, any>,
+const toCache = async <V>(
+  items: Map<string, V>,
   options: cacheOptions
 ): Promise<void> => {
   if (!options.client) {
     return;
   }
 
-  const commands: any[] = [];
+  const commands: any[][] = [];
   items.forEach(async (value, key) => {
     commands.push(["set", key, JSON.stringify(value), "ex", options.ttl]);
   });
