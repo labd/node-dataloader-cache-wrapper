@@ -41,5 +41,9 @@
     "jest-esbuild": "^0.2.9",
     "tsup": "6.7.0",
     "typescript": "5.0.4"
+  },
+  "peerDependencies": {
+    "dataloader": "^2.2.2",
+    "ioredis": "^5.3.2"
   }
 }
