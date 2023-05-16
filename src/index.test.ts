@@ -24,13 +24,20 @@ describe('Test no cache', () => {
         const key = `${ref.id}`
         return [`item-data:${key}:id:${ref.slug}`]
       },
-      lookupFn: (items: MyValue[], ref: MyKey) =>
-        items.find((p) => p.slug === ref.slug),
+      lookupFn: (items: ArrayLike<MyValue | Error>, ref: MyKey) => {
+        for (let i = 0; i < items.length; i++) {
+          const myValue = isMyValue(items[i])
+          if (myValue && myValue.slug === ref.slug) {
+            return myValue
+          }
+        }
+        return undefined
+      },
     })
 
   const fetchItemsBySlugUncached = async (
     keys: readonly MyKey[]
-  ): Promise<(MyValue | null)[]> =>
+  ): Promise<(MyValue | Error)[]> =>
     keys.map((key) => ({
       slug: key.slug,
       name: key.slug,
@@ -49,3 +56,11 @@ describe('Test no cache', () => {
     expect(value.name).toBe('test')
   })
 })
+
+const isMyValue = (val: MyValue | Error) => {
+  if ('slug' in val) {
+    return val
+  }
+  return undefined
+}
+
