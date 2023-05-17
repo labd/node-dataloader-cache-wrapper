@@ -23,15 +23,8 @@ describe('Test no cache', () => {
         const key = `${ref.id}`
         return [`item-data:${key}:id:${ref.slug}`]
       },
-      lookupFn: (items: ArrayLike<MyValue | Error>, ref: MyKey) => {
-        for (let i = 0; i < items.length; i++) {
-          const myValue = isMyValue(items[i])
-          if (myValue && myValue.slug === ref.slug) {
-            return myValue
-          }
-        }
-        return undefined
-      },
+      lookupFn: (items: ArrayLike<MyValue | Error>, ref: MyKey) => Array.prototype.find.call(items, (item) => isMyValue(item) && item.slug === ref.slug )
+      
     })
 
   const fetchItemsBySlugUncached = async (
