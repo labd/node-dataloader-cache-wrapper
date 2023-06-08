@@ -20,9 +20,9 @@ export const dataloaderCache = async <K, V>(
   batchLoadFn: DataLoader.BatchLoadFn<K, V>,
   keys: ReadonlyArray<K>,
   options: cacheOptions
-): Promise<V[]> => {
+): Promise<(V | null)[]> => {
   const items = await fromCache<K, V>(keys, options)
-  const result = new Array<V>(keys.length)
+  const result = new Array<V | null>(keys.length).fill(null)
 
   // Find the items that are not in the cache. Take a shortcut when the cache
   // is empty.
@@ -57,7 +57,9 @@ export const dataloaderCache = async <K, V>(
         })
       }
     })
-    await toCache<V>(buffer, options)
+    if (buffer.size > 0) {
+      await toCache<V>(buffer, options)
+    }
   }
 
   return result
