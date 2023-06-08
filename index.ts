@@ -1,13 +1,17 @@
 import { type Redis } from 'ioredis'
 import type DataLoader from 'dataloader'
 
-export type cacheOptions = {
+export type cacheOptions<K, V> = {
   client?: Redis
   ttl: number
 
-  cacheKeysFn: (ref: any) => string[]
-  lookupFn: (items: any, ref: any) => any
+  cacheKeysFn: (ref: K) => string[]
+  // items of the lookup function need to handle the ReturnType
+  // of the DataLoader.BatchLoadFn<K, V> function signature
+  lookupFn: (items: ArrayLike<V | Error>, ref: K) => Maybe<V>
 }
+
+type Maybe<T> = T | undefined
 
 // dataloaderCache is a wrapper around the dataloader batchLoadFn that adds
 // caching. It takes an array of keys and returns an array of items. If an item
@@ -19,7 +23,7 @@ export type cacheOptions = {
 export const dataloaderCache = async <K, V>(
   batchLoadFn: DataLoader.BatchLoadFn<K, V>,
   keys: ReadonlyArray<K>,
-  options: cacheOptions
+  options: cacheOptions<K, V>
 ): Promise<V[]> => {
   const items = await fromCache<K, V>(keys, options)
   const result = new Array<V>(keys.length)
@@ -57,7 +61,7 @@ export const dataloaderCache = async <K, V>(
         })
       }
     })
-    await toCache<V>(buffer, options)
+    await toCache<K, V>(buffer, options)
   }
 
   return result
@@ -65,7 +69,7 @@ export const dataloaderCache = async <K, V>(
 
 const fromCache = async <K, V>(
   keys: ReadonlyArray<K>,
-  options: cacheOptions
+  options: cacheOptions<K, V>
 ): Promise<V[]> => {
   if (!options.client) {
     return []
@@ -74,22 +78,23 @@ const fromCache = async <K, V>(
   const cacheKeys = keys.flatMap(options.cacheKeysFn)
   const cachedValues = await options.client.mget(cacheKeys)
   return cachedValues
-    .filter((v: any): v is string => v != null)
+    .filter((v): v is string => v != null)
     .map((v: string) => JSON.parse(v))
 }
 
-const toCache = async <V>(
+const toCache = async <K, V>(
   items: Map<string, V>,
-  options: cacheOptions
+  options: cacheOptions<K, V>
 ): Promise<void> => {
   if (!options.client) {
     return
   }
 
-  const commands: any[][] = []
+  const commands: (string | number)[][] = []
   items.forEach(async (value, key) => {
     commands.push(['set', key, JSON.stringify(value), 'ex', options.ttl])
   })
 
   await options.client.multi(commands).exec()
 }
+
