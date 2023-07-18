@@ -24,11 +24,8 @@ describe('Test no cache', () => {
         const key = `${ref.id}`
         return [`item-data:${key}:id:${ref.slug}`]
       },
-      lookupFn: (items: ArrayLike<MyValue | Error>, ref: MyKey) =>
-        Array.prototype.find.call(
-          items,
-          (item) => isMyValue(item) && item.slug === ref.slug
-        ),
+      lookupFn: (items: MyValue[], ref: MyKey) =>
+        items.find((item) => isMyValue(item) && item.slug === ref.slug),
     })
 
   const fetchItemsBySlugUncached = async (

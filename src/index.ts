@@ -6,12 +6,8 @@ export type cacheOptions<K, V> = {
   ttl: number
 
   cacheKeysFn: (ref: K) => string[]
-  // items of the lookup function need to handle the ReturnType
-  // of the DataLoader.BatchLoadFn<K, V> function signature
-  lookupFn: (items: ArrayLike<V | Error>, ref: K) => Maybe<V>
+  lookupFn: (items: V[], ref: K) => V | undefined
 }
-
-type Maybe<T> = T | undefined
 
 // dataloaderCache is a wrapper around the dataloader batchLoadFn that adds
 // caching. It takes an array of keys and returns an array of items. If an item
@@ -50,8 +46,13 @@ export const dataloaderCache = async <K, V>(
     const newItems = await batchLoadFn(cacheMiss)
     const buffer = new Map<string, V>()
 
+    const lookupItems = Array.from(newItems).filter(
+      (item): item is V => item !== null
+    ) as V[]
+
     keys.forEach((key, index) => {
-      const item = options.lookupFn(newItems, key)
+      const item = options.lookupFn(lookupItems, key)
+
       if (item) {
         result[index] = item
 
@@ -97,4 +98,3 @@ const toCache = async <K, V>(
 
   await options.client.multi(commands).exec()
 }
-
