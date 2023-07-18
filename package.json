@@ -30,7 +30,8 @@
     "dev": "tsup --watch",
     "publish:ci": "pnpm build && pnpm changeset publish",
     "test": "vitest run --coverage",
-    "lint": "eslint *.ts"
+    "lint": "eslint *.ts",
+    "tsc": "tsc --noEmit"
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.1",
