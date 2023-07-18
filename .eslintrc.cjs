@@ -1,6 +1,5 @@
 module.exports = {
   extends: [
-    '@labdigital/eslint-config-node',
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
   ],
