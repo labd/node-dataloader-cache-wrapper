@@ -8,14 +8,14 @@
   },
   "description": "Wrapper around dataloader to cache the results of the loader",
   "keywords": [],
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
   "typings": "dist/index.d.ts",
   "type": "module",
   "exports": {
     ".": {
-      "require": "./dist/index.js",
-      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     }
   },
