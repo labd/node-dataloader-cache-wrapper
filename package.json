@@ -30,6 +30,7 @@
     "dev": "tsup --watch",
     "publish:ci": "pnpm build && pnpm changeset publish",
     "test": "vitest run --coverage",
+    "test:ci": "vitest run --coverage",
     "lint": "eslint *.ts",
     "tsc": "tsc --noEmit"
   },
