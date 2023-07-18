@@ -1,5 +1,5 @@
 import DataLoader from 'dataloader'
-import { dataloaderCache } from '.'
+import { dataloaderCache } from './index.js'
 import { describe, expect, it } from 'vitest'
 
 type MyKey = {

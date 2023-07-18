@@ -5,7 +5,7 @@ export default defineConfig({
 		coverage: {
 			provider: "v8",
 			all: true,
-			include: ["*.ts"],
+			include: ["src/*.ts"],
 		},
 		passWithNoTests: true,
 	},

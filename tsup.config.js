@@ -1,5 +1,5 @@
 export default {
-  entry: ["index.ts"],
+  entry: ["src/index.ts"],
   clean: true,
   splitting: false,
   dts: true,
