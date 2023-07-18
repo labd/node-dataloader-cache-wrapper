@@ -1,5 +1,11 @@
 # @labdigital/dataloader-cache-wrapper
 
+## 0.0.4
+
+### Patch Changes
+
+- 0edf554: Fix release artifact
+
 ## 0.0.3
 
 ### Patch Changes
