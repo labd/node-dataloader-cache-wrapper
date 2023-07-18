@@ -1,5 +1,6 @@
 import DataLoader from 'dataloader'
 import { dataloaderCache } from '.'
+import { describe, expect, it } from 'vitest'
 
 type MyKey = {
   id: string
