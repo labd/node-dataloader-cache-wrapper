@@ -1,6 +1,6 @@
 {
   "name": "@labdigital/dataloader-cache-wrapper",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "author": "Lab Digital <opensource@labdigital.nl>",
   "license": "MIT",
   "publishConfig": {

@@ -1,5 +1,11 @@
 # @labdigital/dataloader-cache-wrapper
 
+## 0.0.5
+
+### Patch Changes
+
+- 822774e: Simplify the lookupFn function definition to improve the API
+
 ## 0.0.4
 
 ### Patch Changes
