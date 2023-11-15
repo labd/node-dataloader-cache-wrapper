@@ -1,5 +1,12 @@
 # @labdigital/dataloader-cache-wrapper
 
+## 0.1.0
+
+### Minor Changes
+
+- 01243d5: Move all arguments to the options object for consistency
+- dc082bf: Add support for adding a callback to prime the dataloader cache
+
 ## 0.0.5
 
 ### Patch Changes
