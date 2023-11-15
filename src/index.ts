@@ -9,6 +9,7 @@ export type cacheOptions<K, V> = {
   bachLoadFn: DataLoader.BatchLoadFn<K, V>
   cacheKeysFn: (ref: K) => string[]
   lookupFn: (items: V[], ref: K) => V | undefined
+  primeFn?: (items: V[]) => void
 }
 
 // dataloaderCache is a wrapper around the dataloader batchLoadFn that adds
@@ -89,6 +90,7 @@ const fromCache = async <K, V>(
     .map((v: string) => JSON.parse(v))
 }
 
+// Write items to the cache
 const toCache = async <K, V>(
   items: Map<string, V>,
   options: cacheOptions<K, V>
