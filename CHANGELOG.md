@@ -1,5 +1,11 @@
 # @labdigital/dataloader-cache-wrapper
 
+## 0.1.1
+
+### Patch Changes
+
+- 0fd4457: Fix silly typo in latest change. bachLoadFn -> batchLoadFn
+
 ## 0.1.0
 
 ### Minor Changes
