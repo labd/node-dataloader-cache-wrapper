@@ -2,9 +2,11 @@ import { type Redis } from 'ioredis'
 import type DataLoader from 'dataloader'
 
 export type cacheOptions<K, V> = {
+  keys: ReadonlyArray<K>
   client?: Redis
   ttl: number
 
+  bachLoadFn: DataLoader.BatchLoadFn<K, V>
   cacheKeysFn: (ref: K) => string[]
   lookupFn: (items: V[], ref: K) => V | undefined
 }
@@ -17,21 +19,19 @@ export type cacheOptions<K, V> = {
 // Note: this function is O^2, so it should only be used for small batches of
 // keys.
 export const dataloaderCache = async <K, V>(
-  batchLoadFn: DataLoader.BatchLoadFn<K, V>,
-  keys: ReadonlyArray<K>,
-  options: cacheOptions<K, V>
+  args: cacheOptions<K, V>
 ): Promise<(V | null)[]> => {
-  const items = await fromCache<K, V>(keys, options)
-  const result = new Array<V | null>(keys.length).fill(null)
+  const items = await fromCache<K, V>(args.keys, args)
+  const result = new Array<V | null>(args.keys.length).fill(null)
 
   // Find the items that are not in the cache. Take a shortcut when the cache
   // is empty.
   const cacheMiss: Array<K> = []
   if (items.length === 0) {
-    cacheMiss.push(...keys)
+    cacheMiss.push(...args.keys)
   } else {
-    keys.forEach((key, index) => {
-      const item = options.lookupFn(items, key)
+    args.keys.forEach((key, index) => {
+      const item = args.lookupFn(items, key)
       if (item) {
         result[index] = item
       } else {
@@ -43,31 +43,37 @@ export const dataloaderCache = async <K, V>(
   // Fetch the items that are not in the cache and write them to the cache for
   // next time
   if (cacheMiss.length > 0) {
-    const newItems = await batchLoadFn(cacheMiss)
+    const newItems = await args.bachLoadFn(cacheMiss)
     const buffer = new Map<string, V>()
 
     const lookupItems = Array.from(newItems).filter(
       (item): item is V => item !== null
     ) as V[]
 
-    keys.forEach((key, index) => {
-      const item = options.lookupFn(lookupItems, key)
+    args.keys.forEach((key, index) => {
+      const item = args.lookupFn(lookupItems, key)
 
       if (item) {
         result[index] = item
 
-        const cacheKeys = options.cacheKeysFn(key)
+        const cacheKeys = args.cacheKeysFn(key)
         cacheKeys.forEach((cacheKey) => {
           buffer.set(cacheKey, item)
         })
       }
     })
-    await toCache<K, V>(buffer, options)
+    await toCache<K, V>(buffer, args)
+  }
+
+  // Allow the caller to prime the cache
+  if (args.primeFn) {
+    args.primeFn(result.filter((item): item is V => item !== null))
   }
 
   return result
 }
 
+// Read items from the cache by the keys
 const fromCache = async <K, V>(
   keys: ReadonlyArray<K>,
   options: cacheOptions<K, V>

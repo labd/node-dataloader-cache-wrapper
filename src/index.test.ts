@@ -16,7 +16,9 @@ describe('Test no cache', () => {
   const fetchItemsBySlug = async (
     keys: readonly MyKey[]
   ): Promise<(MyValue | null)[]> =>
-    dataloaderCache(fetchItemsBySlugUncached, keys, {
+    dataloaderCache({
+      bachLoadFn: fetchItemsBySlugUncached,
+      keys: keys,
       client: undefined,
       ttl: 3600,
 
