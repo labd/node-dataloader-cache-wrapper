@@ -17,7 +17,7 @@ describe('Test no cache', () => {
     keys: readonly MyKey[]
   ): Promise<(MyValue | null)[]> =>
     dataloaderCache({
-      bachLoadFn: fetchItemsBySlugUncached,
+      batchLoadFn: fetchItemsBySlugUncached,
       keys: keys,
       client: undefined,
       ttl: 3600,

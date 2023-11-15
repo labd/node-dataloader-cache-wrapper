@@ -6,7 +6,7 @@ export type cacheOptions<K, V> = {
   client?: Redis
   ttl: number
 
-  bachLoadFn: DataLoader.BatchLoadFn<K, V>
+  batchLoadFn: DataLoader.BatchLoadFn<K, V>
   cacheKeysFn: (ref: K) => string[]
   lookupFn: (items: V[], ref: K) => V | undefined
   primeFn?: (items: V[]) => void
@@ -44,7 +44,7 @@ export const dataloaderCache = async <K, V>(
   // Fetch the items that are not in the cache and write them to the cache for
   // next time
   if (cacheMiss.length > 0) {
-    const newItems = await args.bachLoadFn(cacheMiss)
+    const newItems = await args.batchLoadFn(cacheMiss)
     const buffer = new Map<string, V>()
 
     const lookupItems = Array.from(newItems).filter(
