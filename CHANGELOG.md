@@ -1,5 +1,11 @@
 # @labdigital/dataloader-cache-wrapper
 
+## 0.2.0
+
+### Minor Changes
+
+- ffe9f26: Refactor to simplify the API by removing the lookupFn callback
+
 ## 0.1.1
 
 ### Patch Changes
