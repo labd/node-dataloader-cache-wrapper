@@ -21,9 +21,6 @@ export const ProductDataLoader = async (keys: readonly any[]): Promise<(Product 
       const key = `${ref.store}-${ref.locale}-${ref.currency}`;
       return [`some-data:${key}:id:${ref.slug}`];
     },
-    lookupFn: (items: Product[], ref: ProductRef) => {
-      return items.find((p) => p.slug === ref.slug);
-    },
   })
 }
 ```

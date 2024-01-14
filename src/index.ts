@@ -1,5 +1,8 @@
 import { type Redis } from 'ioredis'
+import hashObject from 'object-hash'
 import type DataLoader from 'dataloader'
+
+type NotUndefined = object | string | number | boolean | NotUndefined[];
 
 export type cacheOptions<K, V> = {
   keys: ReadonlyArray<K>
@@ -8,8 +11,6 @@ export type cacheOptions<K, V> = {
 
   batchLoadFn: DataLoader.BatchLoadFn<K, V>
   cacheKeysFn: (ref: K) => string[]
-  lookupFn: (items: V[], ref: K) => V | undefined
-  primeFn?: (items: V[]) => void
 }
 
 // dataloaderCache is a wrapper around the dataloader batchLoadFn that adds
@@ -19,26 +20,21 @@ export type cacheOptions<K, V> = {
 //
 // Note: this function is O^2, so it should only be used for small batches of
 // keys.
-export const dataloaderCache = async <K, V>(
+export const dataloaderCache = async <K extends NotUndefined, V>(
   args: cacheOptions<K, V>
 ): Promise<(V | null)[]> => {
-  const items = await fromCache<K, V>(args.keys, args)
-  const result = new Array<V | null>(args.keys.length).fill(null)
+  const result = await fromCache<K, V>(args.keys, args)
+  const store: Record<string, V> = {}
 
-  // Find the items that are not in the cache. Take a shortcut when the cache
-  // is empty.
+  // Check results, if an item is null then it was not in the cache, we place
+  // these in the cacheMiss array and fetch them.
   const cacheMiss: Array<K> = []
-  if (items.length === 0) {
-    cacheMiss.push(...args.keys)
-  } else {
-    args.keys.forEach((key, index) => {
-      const item = args.lookupFn(items, key)
-      if (item) {
-        result[index] = item
-      } else {
-        cacheMiss.push(key)
-      }
-    })
+  for (const [key, cached] of zip(args.keys, result)) {
+    if (cached === null) {
+      cacheMiss.push(key)
+    } else {
+      store[hashObject(key)] = cached
+    }
   }
 
   // Fetch the items that are not in the cache and write them to the cache for
@@ -47,15 +43,13 @@ export const dataloaderCache = async <K, V>(
     const newItems = await args.batchLoadFn(cacheMiss)
     const buffer = new Map<string, V>()
 
-    const lookupItems = Array.from(newItems).filter(
-      (item): item is V => item !== null
-    ) as V[]
+    zip(cacheMiss, Array.from(newItems)).forEach(([key, item]) => {
+      if (key === undefined) {
+        throw new Error('key is undefined')
+      }
 
-    args.keys.forEach((key, index) => {
-      const item = args.lookupFn(lookupItems, key)
-
-      if (item) {
-        result[index] = item
+      if (!(item instanceof Error)) {
+        store[hashObject(key)] = item
 
         const cacheKeys = args.cacheKeysFn(key)
         cacheKeys.forEach((cacheKey) => {
@@ -63,31 +57,34 @@ export const dataloaderCache = async <K, V>(
         })
       }
     })
+
     await toCache<K, V>(buffer, args)
   }
 
-  // Allow the caller to prime the cache
-  if (args.primeFn) {
-    args.primeFn(result.filter((item): item is V => item !== null))
-  }
+  return args.keys.map((key) => {
+    const item = store[hashObject(key)]
+    if (item) {
+      return item
+    }
 
-  return result
+    return null
+  })
 }
 
 // Read items from the cache by the keys
 const fromCache = async <K, V>(
   keys: ReadonlyArray<K>,
   options: cacheOptions<K, V>
-): Promise<V[]> => {
+): Promise<(V | null)[]> => {
   if (!options.client) {
-    return []
+    return new Array<V | null>(keys.length).fill(null)
   }
 
   const cacheKeys = keys.flatMap(options.cacheKeysFn)
   const cachedValues = await options.client.mget(cacheKeys)
-  return cachedValues
-    .filter((v): v is string => v != null)
-    .map((v: string) => JSON.parse(v))
+  return cachedValues.map((v: string | null) =>
+    v !== null ? JSON.parse(v) : null
+  )
 }
 
 // Write items to the cache
@@ -105,4 +102,15 @@ const toCache = async <K, V>(
   })
 
   await options.client.multi(commands).exec()
+}
+
+function zip<T, U>(arr1: readonly T[], arr2: readonly U[]): [T, U][] {
+  const minLength = Math.min(arr1.length, arr2.length)
+  const result: [T, U][] = []
+
+  for (let i = 0; i < minLength; i++) {
+    result.push([arr1[i], arr2[i]])
+  }
+
+  return result
 }
