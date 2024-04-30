@@ -1,12 +1,12 @@
-import { type Redis } from 'ioredis'
 import hashObject from 'object-hash'
 import type DataLoader from 'dataloader'
+import Keyv from 'keyv'
 
-type NotUndefined = object | string | number | boolean | NotUndefined[];
+type NotUndefined = object | string | number | boolean | NotUndefined[]
 
 export type cacheOptions<K, V> = {
   keys: ReadonlyArray<K>
-  client?: Redis
+  store?: Keyv<V>
   ttl: number
 
   batchLoadFn: DataLoader.BatchLoadFn<K, V>
@@ -76,15 +76,13 @@ const fromCache = async <K, V>(
   keys: ReadonlyArray<K>,
   options: cacheOptions<K, V>
 ): Promise<(V | null)[]> => {
-  if (!options.client) {
+  if (!options.store) {
     return new Array<V | null>(keys.length).fill(null)
   }
 
   const cacheKeys = keys.flatMap(options.cacheKeysFn)
-  const cachedValues = await options.client.mget(cacheKeys)
-  return cachedValues.map((v: string | null) =>
-    v !== null ? JSON.parse(v) : null
-  )
+  const cachedValues = await options.store.get(cacheKeys)
+  return cachedValues.map((v) => v ?? null)
 }
 
 // Write items to the cache
@@ -92,16 +90,12 @@ const toCache = async <K, V>(
   items: Map<string, V>,
   options: cacheOptions<K, V>
 ): Promise<void> => {
-  if (!options.client) {
+  if (!options.store) {
     return
   }
-
-  const commands: (string | number)[][] = []
-  items.forEach(async (value, key) => {
-    commands.push(['set', key, JSON.stringify(value), 'ex', options.ttl])
-  })
-
-  await options.client.multi(commands).exec()
+  for (const [key, value] of items) {
+    options.store.set(key, value, options.ttl)
+  }
 }
 
 function zip<T, U>(arr1: readonly T[], arr2: readonly U[]): [T, U][] {

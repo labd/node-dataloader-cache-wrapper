@@ -1,7 +1,7 @@
 import DataLoader from 'dataloader'
 import { dataloaderCache } from './index.js'
 import { describe, expect, it } from 'vitest'
-import Redis from 'ioredis-mock'
+import Keyv from 'keyv'
 
 type MyKey = {
   id: string
@@ -20,7 +20,7 @@ describe('Test no cache', () => {
     dataloaderCache({
       batchLoadFn: fetchItemsBySlugUncached,
       keys: keys,
-      client: undefined,
+      store: undefined,
       ttl: 3600,
 
       cacheKeysFn: (ref: MyKey) => {
@@ -51,8 +51,8 @@ describe('Test no cache', () => {
   })
 })
 
-describe('Test redis cache', () => {
-  const redis = new Redis()
+describe('Test keyv store', () => {
+  const store = new Keyv()
 
   const fetchItemsBySlug = async (
     keys: readonly MyKey[]
@@ -60,7 +60,7 @@ describe('Test redis cache', () => {
     dataloaderCache({
       batchLoadFn: fetchItemsBySlugUncached,
       keys: keys,
-      client: redis,
+      store: store,
       ttl: 3600,
 
       cacheKeysFn: (ref: MyKey) => {
@@ -88,9 +88,6 @@ describe('Test redis cache', () => {
     })
     expect(value.slug).toBe('test-1')
     expect(value.name).toBe('test-1')
-
-    const data = await redis.keys('*')
-    expect(data.length).toBe(1)
 
     // This should be one cache hit
     {
@@ -139,10 +136,3 @@ describe('Test redis cache', () => {
     }
   })
 })
-
-const isMyValue = (val: MyValue | Error) => {
-  if ('slug' in val) {
-    return val
-  }
-  return undefined
-}

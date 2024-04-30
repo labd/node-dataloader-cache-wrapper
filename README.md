@@ -14,7 +14,7 @@ export const createProductBySlugLoader = () => {
 
 export const ProductDataLoader = async (keys: readonly any[]): Promise<(Product | null)[]> => {
   return dataloaderCache(_uncachedProductDataLoader, keys, {
-    client: redisClient,
+    store: new Keyv(),
     ttl: 3600,
 
     cacheKeysFn: (ref: ProductRef) => {
