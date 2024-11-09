@@ -1,5 +1,11 @@
 # @labdigital/dataloader-cache-wrapper
 
+## 0.4.0
+
+### Minor Changes
+
+- 8b10587: Properly support caching null values, and dont handle these as missing
+
 ## 0.3.0
 
 ### Minor Changes
