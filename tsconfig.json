@@ -1,8 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    "module": "esnext",
-    "lib": ["esnext"],
+    "module": "ES2022",
     "allowJs": true,
     "importHelpers": true,
     "declaration": true,
@@ -12,8 +11,7 @@
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "moduleResolution": "node",
-    "jsx": "react",
+    "moduleResolution": "bundler",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
