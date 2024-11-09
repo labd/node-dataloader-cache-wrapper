@@ -21,16 +21,16 @@ export type cacheOptions<K, V> = {
 // Note: this function is O^2, so it should only be used for small batches of
 // keys.
 export const dataloaderCache = async <K extends NotUndefined, V>(
-  args: cacheOptions<K, V>
+  args: cacheOptions<K, V | null>
 ): Promise<(V | null)[]> => {
   const result = await fromCache<K, V>(args.keys, args)
-  const store: Record<string, V> = {}
+  const store: Record<string, V | null> = {}
 
   // Check results, if an item is null then it was not in the cache, we place
   // these in the cacheMiss array and fetch them.
   const cacheMiss: Array<K> = []
   for (const [key, cached] of zip(args.keys, result)) {
-    if (cached === null) {
+    if (cached === undefined) {
       cacheMiss.push(key)
     } else {
       store[hashObject(key)] = cached
@@ -41,7 +41,7 @@ export const dataloaderCache = async <K extends NotUndefined, V>(
   // next time
   if (cacheMiss.length > 0) {
     const newItems = await args.batchLoadFn(cacheMiss)
-    const buffer = new Map<string, V>()
+    const buffer = new Map<string, V | null>()
 
     zip(cacheMiss, Array.from(newItems)).forEach(([key, item]) => {
       if (key === undefined) {
@@ -58,7 +58,7 @@ export const dataloaderCache = async <K extends NotUndefined, V>(
       }
     })
 
-    await toCache<K, V>(buffer, args)
+    await toCache<K, V | null>(buffer, args)
   }
 
   return args.keys.map((key) => {
@@ -74,27 +74,31 @@ export const dataloaderCache = async <K extends NotUndefined, V>(
 // Read items from the cache by the keys
 const fromCache = async <K, V>(
   keys: ReadonlyArray<K>,
-  options: cacheOptions<K, V>
-): Promise<(V | null)[]> => {
+  options: cacheOptions<K, V | null>
+): Promise<(V | null | undefined)[]> => {
   if (!options.store) {
-    return new Array<V | null>(keys.length).fill(null)
+    return new Array<V | null | undefined>(keys.length).fill(undefined)
   }
 
   const cacheKeys = keys.flatMap(options.cacheKeysFn)
   const cachedValues = await options.store.get(cacheKeys)
-  return cachedValues.map((v) => v ?? null)
+  return cachedValues.map((v) => v )
 }
 
 // Write items to the cache
 const toCache = async <K, V>(
-  items: Map<string, V>,
-  options: cacheOptions<K, V>
+  items: Map<string, V | null>,
+  options: cacheOptions<K, V | null>
 ): Promise<void> => {
   if (!options.store) {
     return
   }
   for (const [key, value] of items) {
-    options.store.set(key, value, options.ttl)
+    options.store.set(
+      key,
+      value,
+      options.ttl
+    )
   }
 }
 
