@@ -32,6 +32,7 @@
 		"publish:version": "pnpm changeset version && pnpm format",
 		"test": "vitest run --coverage",
 		"test:ci": "vitest run --coverage",
+		"format": "biome format --fix",
 		"lint": "biome check",
 		"tsc": "tsc --noEmit"
 	},
