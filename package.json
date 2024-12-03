@@ -29,6 +29,7 @@
 		"build": "tsup",
 		"dev": "tsup --watch",
 		"publish:ci": "pnpm build && pnpm changeset publish",
+		"publish:version": "pnpm changeset version && pnpm format",
 		"test": "vitest run --coverage",
 		"test:ci": "vitest run --coverage",
 		"lint": "biome check",
