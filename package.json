@@ -1,56 +1,55 @@
 {
-  "name": "@labdigital/dataloader-cache-wrapper",
-  "version": "0.4.0",
-  "author": "Lab Digital <opensource@labdigital.nl>",
-  "license": "MIT",
-  "publishConfig": {
-    "access": "public"
-  },
-  "description": "Wrapper around dataloader to cache the results of the loader",
-  "keywords": [],
-  "main": "dist/index.cjs",
-  "module": "dist/index.js",
-  "typings": "dist/index.d.ts",
-  "type": "module",
-  "exports": {
-    ".": {
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
-  },
-  "prettier": {
-    "printWidth": 80,
-    "semi": false,
-    "singleQuote": true,
-    "trailingComma": "es5"
-  },
-  "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
-    "publish:ci": "pnpm build && pnpm changeset publish",
-    "test": "vitest run --coverage",
-    "test:ci": "vitest run --coverage",
-    "lint": "eslint src/",
-    "tsc": "tsc --noEmit"
-  },
-  "devDependencies": {
-    "@changesets/cli": "^2.26.1",
-    "@types/object-hash": "^3.0.6",
-    "@vitest/coverage-v8": "^2.1.8",
-    "dataloader": "^2.2.2",
-    "eslint": "^8.40.0",
-    "eslint-plugin-unused-imports": "^2.0.0",
-    "tsup": "6.7.0",
-    "typescript": "5.7.2",
-    "vitest": "^2.1.8"
-  },
-  "peerDependencies": {
-    "dataloader": ">=2.0 <3.0",
-    "keyv": ">=4.0.0 <6.0.0"
-  },
-  "dependencies": {
-    "object-hash": "^3.0.0"
-  },
-  "packageManager": "pnpm@9.4.0"
+	"name": "@labdigital/dataloader-cache-wrapper",
+	"version": "0.4.0",
+	"author": "Lab Digital <opensource@labdigital.nl>",
+	"license": "MIT",
+	"publishConfig": {
+		"access": "public"
+	},
+	"description": "Wrapper around dataloader to cache the results of the loader",
+	"keywords": [],
+	"main": "dist/index.cjs",
+	"module": "dist/index.js",
+	"typings": "dist/index.d.ts",
+	"type": "module",
+	"exports": {
+		".": {
+			"require": "./dist/index.cjs",
+			"import": "./dist/index.js",
+			"types": "./dist/index.d.ts"
+		}
+	},
+	"prettier": {
+		"printWidth": 80,
+		"semi": false,
+		"singleQuote": true,
+		"trailingComma": "es5"
+	},
+	"scripts": {
+		"build": "tsup",
+		"dev": "tsup --watch",
+		"publish:ci": "pnpm build && pnpm changeset publish",
+		"test": "vitest run --coverage",
+		"test:ci": "vitest run --coverage",
+		"lint": "biome check",
+		"tsc": "tsc --noEmit"
+	},
+	"devDependencies": {
+		"@changesets/cli": "^2.26.1",
+		"@types/object-hash": "^3.0.6",
+		"@vitest/coverage-v8": "^2.1.8",
+		"dataloader": "^2.2.2",
+		"tsup": "6.7.0",
+		"typescript": "5.7.2",
+		"vitest": "^2.1.8"
+	},
+	"peerDependencies": {
+		"dataloader": ">=2.0 <3.0",
+		"keyv": ">=4.0.0 <6.0.0"
+	},
+	"dependencies": {
+		"@biomejs/biome": "^1.9.4",
+		"object-hash": "^3.0.0"
+	},
+	"packageManager": "pnpm@9.4.0"
 }
