@@ -36,21 +36,21 @@
 		"tsc": "tsc --noEmit"
 	},
 	"devDependencies": {
-		"@changesets/cli": "^2.26.1",
-		"@types/object-hash": "^3.0.6",
-		"@vitest/coverage-v8": "^2.1.8",
+		"@changesets/cli": "2.27.0",
+		"@types/object-hash": "3.0.6",
+		"@vitest/coverage-v8": "2.1.8",
 		"dataloader": "^2.2.2",
-		"tsup": "6.7.0",
+		"tsup": "8.3.5",
 		"typescript": "5.7.2",
-		"vitest": "^2.1.8"
+		"vitest": "2.1.8"
 	},
 	"peerDependencies": {
 		"dataloader": ">=2.0 <3.0",
 		"keyv": ">=4.0.0 <6.0.0"
 	},
 	"dependencies": {
-		"@biomejs/biome": "^1.9.4",
-		"object-hash": "^3.0.0"
+		"@biomejs/biome": "1.9.4",
+		"object-hash": "3.0.0"
 	},
 	"packageManager": "pnpm@9.4.0"
 }
