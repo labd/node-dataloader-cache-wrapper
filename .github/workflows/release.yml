@@ -1,88 +1,57 @@
-name: Release
-on: [push]
+name: validate
 
-env:
-  CI: true
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
 
 jobs:
-  lint:
-    name: Lint codebase
-    runs-on: ubuntu-latest
+  validate:
+    name: Validate on Node ${{ matrix.node }}
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
+    strategy:
+      matrix:
+        node: ["20.x", "22.x"]
+    runs-on: "ubuntu-latest"
+    env:
+      CI: true
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v3
-        name: Install pnpm
-        id: pnpm-install
-
       - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: "pnpm"
-
-      - name: Run PNPM install
-        run: pnpm install --frozen-lockfile
-
-      - name: Lint
-        run: pnpm lint
-
-  build:
-    name: Build, and test on Node ${{ matrix.node }} and ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    needs: lint
-    strategy:
-      matrix:
-        node: ["18.x", "20.x"]
-        os: [ubuntu-latest]
-
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-
-      - uses: pnpm/action-setup@v3
-        name: Install pnpm
-        id: pnpm-install
-
-      - name: Use Node ${{ matrix.node }}
-        uses: actions/setup-node@v4
+        uses: labd/gh-actions-typescript/pnpm-install@main
         with:
           node-version: ${{ matrix.node }}
-          cache: "pnpm"
 
-      - name: Run PNPM install
-        run: pnpm install --frozen-lockfile
+      - name: Check formatting and typing
+        run: pnpm check
 
-      - name: Test
+      - name: Run tests
         run: pnpm test:ci
 
-      - name: Build
+      - name: Run build
         run: pnpm build
 
   release:
     timeout-minutes: 15
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: validate
     steps:
-      - name: Checkout
+      - name: Checkout repo
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - uses: pnpm/action-setup@v3
-        name: Install pnpm
-        id: pnpm-install
+      - name: Set up Node.js
+        uses: labd/gh-actions-typescript/pnpm-install@main
 
-      - name: Install node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: "pnpm"
-
-      - name: Run PNPM install
-        run: pnpm install --frozen-lockfile
+      - name: Run build
+        run: pnpm build
 
       - name: Create and publish versions
         uses: changesets/action@v1
