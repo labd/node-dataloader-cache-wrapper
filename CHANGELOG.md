@@ -1,5 +1,11 @@
 # @labdigital/dataloader-cache-wrapper
 
+## 0.5.1
+
+### Patch Changes
+
+- 10d8cdf: Update dependencies
+
 ## 0.5.0
 
 ### Minor Changes
