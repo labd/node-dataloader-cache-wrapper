@@ -27,6 +27,7 @@
 	},
 	"scripts": {
 		"build": "tsup",
+		"check": "pnpm lint && pnpm tsc",
 		"dev": "tsup --watch",
 		"publish:ci": "pnpm build && pnpm changeset publish",
 		"publish:version": "pnpm changeset version && pnpm format",
