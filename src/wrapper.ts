@@ -24,11 +24,14 @@ export class DataLoaderCache<K extends NotUndefined, V> {
 	_cacheStore?: Keyv<V | null>;
 	_cacheKeyFn: (key: K) => string;
 
+	name: string | undefined
+
 	constructor(
 		batchLoadFn: BatchLoadFn<K, V | null>,
 		options: Options<K, V, string>,
 	) {
 		this._cacheKeyFn = options.cacheKeyFn;
+		this.name = options.name
 
 		let wrappedBatchLoadFn: BatchLoadFn<K, V | null>;
 		if (options.cache) {
@@ -56,6 +59,10 @@ export class DataLoaderCache<K extends NotUndefined, V> {
 			cacheKeyFn: this._cacheKeyFn,
 			name: options.name,
 		});
+	}
+
+	prime(key: K, value: V | null) {
+		return this._dataloader.prime(key, value);
 	}
 
 	async load(key: K): Promise<V | null> {
