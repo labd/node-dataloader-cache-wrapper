@@ -1,7 +1,7 @@
 import DataLoader from "dataloader";
 import Keyv from "keyv";
 import { assert, describe, expect, it } from "vitest";
-import { dataloaderCache } from "./index.js";
+import { dataloaderCache } from "./cache";
 
 type MyKey = {
 	id: string;
