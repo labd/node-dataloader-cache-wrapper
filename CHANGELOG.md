@@ -1,5 +1,11 @@
 # @labdigital/dataloader-cache-wrapper
 
+## 0.6.2
+
+### Patch Changes
+
+- 207909c: Fix type mismastch with DataLoader
+
 ## 0.6.1
 
 ### Patch Changes
