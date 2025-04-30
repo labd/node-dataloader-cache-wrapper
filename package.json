@@ -1,6 +1,6 @@
 {
 	"name": "@labdigital/dataloader-cache-wrapper",
-	"version": "0.6.0",
+	"version": "0.6.1",
 	"author": "Lab Digital <opensource@labdigital.nl>",
 	"repository": {
 		"type": "git",
