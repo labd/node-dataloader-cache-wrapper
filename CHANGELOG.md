@@ -1,5 +1,11 @@
 # @labdigital/dataloader-cache-wrapper
 
+## 0.6.1
+
+### Patch Changes
+
+- 67309b2: Fix missing attributes on DataLoaderCache
+
 ## 0.6.0
 
 ### Minor Changes
