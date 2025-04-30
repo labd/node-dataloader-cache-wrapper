@@ -1,5 +1,13 @@
 # @labdigital/dataloader-cache-wrapper
 
+## 0.6.0
+
+### Minor Changes
+
+- 178f4b2: Add new class `DataLoaderCache` to simplify the API. It wraps the `DataLoader`
+  class and automatically uses the `dataloaderCache` when the `cache` option is
+  configured.
+
 ## 0.5.1
 
 ### Patch Changes
