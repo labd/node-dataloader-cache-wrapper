@@ -24,14 +24,14 @@ export class DataLoaderCache<K extends NotUndefined, V> {
 	_cacheStore?: Keyv<V | null>;
 	_cacheKeyFn: (key: K) => string;
 
-	name: string | undefined
+	name: string | undefined;
 
 	constructor(
 		batchLoadFn: BatchLoadFn<K, V | null>,
 		options: Options<K, V, string>,
 	) {
 		this._cacheKeyFn = options.cacheKeyFn;
-		this.name = options.name
+		this.name = options.name;
 
 		let wrappedBatchLoadFn: BatchLoadFn<K, V | null>;
 		if (options.cache) {
