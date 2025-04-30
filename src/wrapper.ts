@@ -10,7 +10,7 @@ type Options<K, V, C = K> = {
 	};
 	cacheKeyFn: (key: K) => string;
 	maxBatchSize?: number;
-	name?: string;
+	name?: string | null;
 };
 
 /**
@@ -19,19 +19,21 @@ type Options<K, V, C = K> = {
  * cacheKeyFn to generate the cache key (which needs to return a string).
  *
  */
-export class DataLoaderCache<K extends NotUndefined, V> {
+export class DataLoaderCache<K extends NotUndefined, V>
+	implements DataLoader<K, V | null>
+{
 	_dataloader: DataLoader<K, V | null>;
 	_cacheStore?: Keyv<V | null>;
 	_cacheKeyFn: (key: K) => string;
 
-	name: string | undefined;
+	name: string | null;
 
 	constructor(
 		batchLoadFn: BatchLoadFn<K, V | null>,
 		options: Options<K, V, string>,
 	) {
 		this._cacheKeyFn = options.cacheKeyFn;
-		this.name = options.name;
+		this.name = options.name ?? null;
 
 		let wrappedBatchLoadFn: BatchLoadFn<K, V | null>;
 		if (options.cache) {
@@ -61,8 +63,19 @@ export class DataLoaderCache<K extends NotUndefined, V> {
 		});
 	}
 
-	prime(key: K, value: V | null) {
-		return this._dataloader.prime(key, value);
+	prime(key: K, value: V | PromiseLike<V> | Error) {
+		this._dataloader.prime(key, value);
+		return this;
+	}
+
+	clear(key: K) {
+		this._dataloader.clear(key);
+		return this;
+	}
+
+	clearAll() {
+		this._dataloader.clearAll();
+		return this;
 	}
 
 	async load(key: K): Promise<V | null> {
@@ -73,14 +86,14 @@ export class DataLoaderCache<K extends NotUndefined, V> {
 		return this._dataloader.loadMany(keys);
 	}
 
-	async clear(key: K) {
+	async clearCache(key: K) {
 		if (this._cacheStore) {
 			await this._cacheStore.delete(this._cacheKeyFn(key));
 		}
 		return this._dataloader.clear(key);
 	}
 
-	async clearAll() {
+	async clearCacheAll() {
 		if (this._cacheStore) {
 			await this._cacheStore.clear();
 		}
