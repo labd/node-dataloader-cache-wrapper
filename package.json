@@ -2,6 +2,10 @@
 	"name": "@labdigital/dataloader-cache-wrapper",
 	"version": "0.5.1",
 	"author": "Lab Digital <opensource@labdigital.nl>",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/labd/dataloader-cache-wrapper"
+	},
 	"license": "MIT",
 	"publishConfig": {
 		"access": "public"
